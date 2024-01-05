@@ -31,8 +31,10 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '1.2rem',
         textAlign: 'center',
         marginBottom: '1.5rem',
-        borderBottom: `1px solid ${color.buttonGradient}`,
-        color: color.buttonGradient   
+        border: `1px solid ${color.buttonGradient}`,
+        color: color.white,
+        background: color.buttonGradient,
+        width: '100%'   
     }
 }));
 

@@ -39,22 +39,27 @@ const VirtualRoomLayout = () => {
     let [moderator] = unorderedParticipants.filter(participant => participant?._identity.user.name=== 'admin');
 
     let participants = [];
-    participants.push(moderator);
-    let pinnedParticipantId = layout.pinnedParticipant.participantId;
+    let unpinnedParticipantIds=[];
+    let virtualParticipantId = layout.virtualParticipant.participantId;
 
-    unorderedParticipants.forEach(p=>{
-      if(p._id === pinnedParticipantId){
-          let pinnedParticipant = unorderedParticipants.filter(p => p._id === pinnedParticipantId)[0];
-          participants.unshift(pinnedParticipant);    
+    unorderedParticipants?.forEach(p=>{
+      if(p._id === virtualParticipantId){
+          let virtualParticipant = unorderedParticipants.filter(p => p._id === virtualParticipantId)[0];
+          participants.unshift(virtualParticipant);   
+      }
+      else if(p._id === moderator?._id){
+        participants.push(moderator);
       }else{
-          return;
+        unpinnedParticipantIds.push(p._id);
       }
   });
-
+console.log('first confe', conference, virtualParticipantId, unpinnedParticipantIds, participants)
   return (
+    <>
+    {virtualParticipantId && ((localUser.id === virtualParticipantId) || (conference?.isModerator())) ? 
     <Box className={classes.box}>
       <Typography className={classes.title}>Virtual Breakout Room</Typography>
-      {pinnedParticipantId ? <Grid container className={classes.gridContainer}>
+      <Grid container className={classes.gridContainer}>
             {participants.map((participant, index) => {
                 console.log('virtial unorderedParticipants index', localUser, index, participants[index]?._id, participants)
                 return (tracks[participants[index]?._id] || participants[index]?._id) &&<Grid item md={6}>
@@ -68,13 +73,15 @@ const VirtualRoomLayout = () => {
                         localUserId={conference.myUserId()}
                         totalTracks = {tracks}
                         totalParticipants = {unorderedParticipants}
+                        unpinnedParticipantIds={unpinnedParticipantIds}
                     />
                 </Grid>
             })
             }
         </Grid>
-        : null}
     </Box>
+        : null}
+    </>
   )
 }
 

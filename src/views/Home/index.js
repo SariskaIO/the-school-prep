@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addLocalTrack } from '../../store/actions/track';
 import { Box } from '@material-ui/core';
 import LobbyRoom from '../../components/home/LobbyRoom';
-import sariskaMediaTransport from 'sariska-media-transport';
+import SariskaMediaTransport from 'sariska-media-transport';
 import { RESOLUTION } from '../../constants';
 
 const Home = () => {
   const [localTracks, setLocalTracks] = useState([]);
   const localTracksRedux = useSelector(state => state.localTrack);
 
-  sariskaMediaTransport.initialize();
-  sariskaMediaTransport.setLogLevel(sariskaMediaTransport.logLevels.Error);
+  SariskaMediaTransport.initialize();
+  SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.Error);
 
   const dispatch = useDispatch();
 
@@ -22,13 +22,13 @@ const Home = () => {
     const createLocalTracks = async() => {
       let tracks=[];
       try {
-        const [audioTrack] = await sariskaMediaTransport.createLocalTracks({devices: ["audio"], resolution: RESOLUTION});
+        const [audioTrack] = await SariskaMediaTransport.createLocalTracks({devices: ["audio"], resolution: RESOLUTION});
         tracks.push(audioTrack)
       } catch (error) {
         console.log('error in fetching audio track', error);
       }
       try {
-        const [videoTrack] = await sariskaMediaTransport.createLocalTracks({devices: ["video"], resolution: RESOLUTION});
+        const [videoTrack] = await SariskaMediaTransport.createLocalTracks({devices: ["video"], resolution: RESOLUTION});
         tracks.push(videoTrack)
       } catch (error) {
         console.log('error in fetching video track', error);

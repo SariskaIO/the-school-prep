@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import sariskaMediaTransport from 'sariska-media-transport';
-import { setModerator, setPinParticipant } from '../../store/actions/layout';
+import { setModerator, setPinParticipant, setVirtualParticipant } from '../../store/actions/layout';
 import { addRemoteTrack, participantLeft, removeRemoteTrack } from '../../store/actions/track';
 import Home from '../Home';
 import { Box, makeStyles } from '@material-ui/core';
 import MainLayout from '../../components/meeting/MainLayout';
 import VirtualRoomLayout from '../../components/meeting/VirtualRoomLayout';
+import ActionButtons from '../../components/meeting/ActionButtons';
 
 const useStyles = makeStyles((theme) => ({
   meetingContainer: {
@@ -40,6 +41,9 @@ console.log('meeting here')
       return;
     }
     conference.getParticipantsWithoutHidden().forEach((item) => {
+      if (item._properties?.isVirtual) {
+        dispatch(setVirtualParticipant(item._properties?.isVirtual));
+      }
       if (item._properties?.isModerator === "true") {
           dispatch(setModerator({ participantId: item._id, isModerator: true }));
         }
@@ -56,7 +60,7 @@ console.log('meeting here')
     conference.addEventListener(
       sariskaMediaTransport.events.conference.TRACK_ADDED,
       (track) => {
-        console.log('track addded', track);
+        console.log('track addded', track, track?.getType(), track?.isMuted());
         if (track.isLocal()) {
           return;
         }
@@ -71,7 +75,18 @@ console.log('meeting here')
     conference.addEventListener(
       sariskaMediaTransport.events.conference.PARTICIPANT_PROPERTY_CHANGED,
       (participant, key, oldValue, newValue) => {
-        console.log('PARTICIPANT_PROPERTY_CHANGED')
+        console.log('PARTICIPANT_PROPERTY_CHANGED', participant, newValue);
+        if ((key === "isVirtual") && newValue) {
+          dispatch(
+            dispatch(setVirtualParticipant(newValue))
+          );
+        }
+
+        if (key === "isVirtual" && !newValue) {
+          dispatch(
+            dispatch(setVirtualParticipant(null))
+          );
+        }
         if (key === "isModerator" && newValue === "true") {
           dispatch(
             setModerator({ participantId: participant._id, isModerator: true })
@@ -91,7 +106,7 @@ console.log('meeting here')
       }
       const userLeft = (id) => {
         if (id === layout.pinnedParticipant.participantId) {
-          dispatch(setPinParticipant(null));
+          dispatch(setPinParticipant(null, null));
         }
         dispatch(participantLeft(id));
       };
@@ -109,11 +124,11 @@ console.log('meeting here')
     
   return (
     <Box sx={{display: 'flex'}}>
-
-<Box className={classes.meetingContainer}>
-      <MainLayout />
+      <Box className={classes.meetingContainer}>
+        <MainLayout />
       </Box>
       <VirtualRoomLayout />
+      {!layout.pinnedParticipant.participantId ? <ActionButtons /> : null}
     </Box>
   )
 }

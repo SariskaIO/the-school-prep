@@ -22,6 +22,14 @@ export const setPinParticipant = (id, type) => {
     }
 }
 
+
+export const setVirtualParticipant = (participantId) => {
+    return {
+        type: Constants.SET_VIRTUAL_PARTICIPANT,
+        payload: { participantId},
+    }
+}
+
 //will be fired on remote side when local user changes his local property
 export const setRaiseHand = (payload) => {
     return {

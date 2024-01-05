@@ -1,4 +1,4 @@
-import {SET_FULLSCREEN_MODE, SET_USER_RESOLUTION, SET_LAYOUT, SET_HAND_RAISE, SET_PIN_PARTICIPANT, SET_PRESENTER, SET_DISCONNECTED, SET_PRESENTATION_TYPE, SET_MODERATOR, SET_START_WHITEBOARD, SET_STOP_WHITEBOARD, SET_START_SHARED_DOCUMENTS, SET_STOP_SHARED_DOCUMENTS} from "../actions/types";
+import {SET_FULLSCREEN_MODE, SET_USER_RESOLUTION, SET_LAYOUT, SET_HAND_RAISE, SET_PIN_PARTICIPANT, SET_PRESENTER, SET_DISCONNECTED, SET_PRESENTATION_TYPE, SET_MODERATOR, SET_START_WHITEBOARD, SET_STOP_WHITEBOARD, SET_START_SHARED_DOCUMENTS, SET_STOP_SHARED_DOCUMENTS, SET_VIRTUAL_PARTICIPANT} from "../actions/types";
 import {EXIT_FULL_SCREEN_MODE, GRID} from "../../constants";
 import { isMobileOrTab } from "../../utils";
 
@@ -6,6 +6,7 @@ const initialState  = {
     type: GRID,  //default layout,
     mode: EXIT_FULL_SCREEN_MODE, //default mode,
     pinnedParticipant: {},
+    virtualParticipant: {},
     presenterParticipantIds: [],
     raisedHandParticipantIds: {}, //for remote user to know about who have raised hands
     disconnected: null,
@@ -55,6 +56,9 @@ export const layout = (state = initialState, action) => {
             return {...state};
         case SET_PIN_PARTICIPANT:
             state.pinnedParticipant = action.payload.participantId ? {isPresenter: action.payload.type, participantId: action.payload.participantId} : {} ;
+            return {...state};
+        case SET_VIRTUAL_PARTICIPANT:
+            state.virtualParticipant = action.payload.participantId ? {participantId: action.payload.participantId} : {} ;
             return {...state};
         case SET_PRESENTATION_TYPE:
             state.presentationType = action.payload.presentationType;

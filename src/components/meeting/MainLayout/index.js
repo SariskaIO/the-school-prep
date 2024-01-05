@@ -46,7 +46,7 @@ console.log('unorderedParticipants 1', unorderedParticipants , tracks, remoteTra
         <Typography className={classes.title}>Meeting Room</Typography>
         <Grid container className={classes.gridContainer}>
             {unorderedParticipants.map((participant, index) => {
-                console.log('first unorderedParticipants index', index, unorderedParticipants[index]?._id)
+                console.log('first unorderedParticipants index', index, unorderedParticipants[index]?._id, conference)
                 return (tracks[unorderedParticipants[index]?._id] || unorderedParticipants[index]?._id) &&<Grid item md={6}>
                     <VideoBox key={index}
                        // height={VIDEO_DIMENTIONS.HEIGHT}
