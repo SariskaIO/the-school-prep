@@ -9,10 +9,12 @@ import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import { setPinParticipant, setVirtualParticipant } from '../../../store/actions/layout';
 import PinParticipant from '../PinParticipant';
-import { AVATAR_DIMENTIONS, VIDEO_DIMENTIONS } from '../../../constants';
+import { AVATAR_DIMENTIONS, RESOLUTION, VIDEO_DIMENTIONS } from '../../../constants';
 import { getTrackByType } from '../../../utils';
 import Audio from '../Audio';
 import VirtualizeParticipant from '../VirtualizeParticipant';
+import SariskaMediaTransport from 'sariska-media-transport';
+import { addLocalTrack } from '../../../store/actions/track';
 
 const VideoBox = ({
     tracks, height, width, minWidth, minHeight, localUserId, participantDetails, isPresenter,
@@ -106,25 +108,46 @@ const VideoBox = ({
   useEffect(()=>{
     let otherTracks = []; 
     if(!totalTracks ){ return; }
-    if(!virtualParticipant.participantId ){ return; }
+    let keyLength = Object.keys(virtualParticipant)?.length;
+    if(!keyLength ){ return; }
     unpinnedParticipantIds?.map(id => otherTracks.push(getTrackByType(totalTracks[id], 'audio')));
     console.log('unpinnedParticipantIds other', unpinnedParticipantIds, otherTracks, virtualParticipant, localUserId);
-    if(Object.keys(virtualParticipant)?.length){
+    let keyValue = virtualParticipant['participantId']
+    if(keyValue){
       totalParticipants?.forEach(async (participant) => {
         if(conference?.isModerator()){
           return;
         }
-        else if( participant?._id === localUserId && participant?._id === virtualParticipant?.participantId){
+        else if( participant?._id === localUserId && participant?._id === keyValue){
           console.log('first participant participant', participant)
           otherTracks?.map(async (track) => await conference.removeTrack(track));
         }
         else{
           if(totalParticipants?.length<3){return;}
-          let virtualParticipantAudioTrack = getTrackByType(totalTracks[virtualParticipant?.participantId], 'audio');
+          let virtualParticipantAudioTrack = getTrackByType(totalTracks[keyValue], 'audio');
           console.log('virtualParticipantAudioTrack', virtualParticipantAudioTrack)
           await conference.removeTrack(virtualParticipantAudioTrack);
         }
       })
+    }else{
+      let localTracksLength = conference.getLocalTracks()?.length;
+      if(localTracksLength === 1){
+        const createLocalTracks = async() => {
+          let tracks=[];
+          try {
+            const [audioTrack] = await SariskaMediaTransport.createLocalTracks({devices: ["audio"], resolution: RESOLUTION});
+            tracks.push(audioTrack)
+          } catch (error) {
+            console.log('error in fetching audio track', error);
+          }
+          tracks.forEach(async (track) => {
+            dispatch(addLocalTrack(track));
+            await conference.addTrack(track);
+          });
+        }
+        createLocalTracks();
+      }
+
     }
   },[virtualParticipant?.participantId])
 
