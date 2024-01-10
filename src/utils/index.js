@@ -89,3 +89,27 @@ export function formatAMPM(date) {
     var strTime = hours + ':' + minutes + ' ' + ampm;
     return strTime;
 }
+
+export const getIsAudio = (virtualParticipant, moderator, localUserId, participantDetails) => {
+    if(Object.keys(virtualParticipant)?.length){
+        let isVirtualParticipantOrModerator = (participantDetails?.id === virtualParticipant?.participantId) || (participantDetails?.id === moderator?._id);
+        console.log('isVirtualParticipantOrModerator', moderator, participantDetails, isVirtualParticipantOrModerator);
+      if(localUserId === moderator?._id){
+        return true;
+      }else if(localUserId === virtualParticipant?.participantId){
+        if(isVirtualParticipantOrModerator){
+          return true;
+        }else{
+          return false;
+        }
+      }else{
+        if(isVirtualParticipantOrModerator){
+          return false;
+        }else{
+          return true;
+        }
+      }
+    }else{
+      return true;
+    }
+  }

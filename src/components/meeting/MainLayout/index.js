@@ -40,6 +40,7 @@ const MainLayout = () => {
     const tracks = { ...remoteTracks, [localUser.id]: localTracks };
     // all tracks
     const unorderedParticipants = [...conference.getParticipantsWithoutHidden(), { _identity: { user: localUser }, _id: localUser.id }];
+    let [moderator] = unorderedParticipants.filter(participant => participant?._identity.user.name=== 'admin');
 console.log('unorderedParticipants 1', unorderedParticipants , tracks, remoteTracks, conference, conference.getParticipantsWithoutHidden())
   return (
     <Box className={classes.box}>
@@ -56,6 +57,7 @@ console.log('unorderedParticipants 1', unorderedParticipants , tracks, remoteTra
                         participantDetails={unorderedParticipants[index]?._identity?.user}
                         tracks={tracks[unorderedParticipants[index]._id]}
                         localUserId={conference.myUserId()}
+                        moderator={moderator}
                     />
                 </Grid>
             })

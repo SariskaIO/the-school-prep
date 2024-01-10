@@ -74,6 +74,7 @@ console.log('first confe', conference, virtualParticipantId, unpinnedParticipant
                         totalTracks = {tracks}
                         totalParticipants = {unorderedParticipants}
                         unpinnedParticipantIds={unpinnedParticipantIds}
+                        moderator={moderator}
                     />
                 </Grid>
             })
